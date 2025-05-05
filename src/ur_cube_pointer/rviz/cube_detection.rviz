@@ -1,0 +1,4 @@
+<!-- Empty RViz configuration file. Configure displays in RViz and save here. -->
+<!-- Common displays might include: RobotModel, TF, Image, Marker (for cube detections) -->
+<Displays>
+</Displays>

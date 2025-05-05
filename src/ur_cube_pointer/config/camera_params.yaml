@@ -1,0 +1,26 @@
+# Camera intrinsic parameters (example)
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [fx, 0, cx, 0, fy, cy, 0, 0, 1]
+
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [k1, k2, p1, p2, k3]
+
+# HSV color thresholds for cube detection (example)
+color_thresholds:
+  red:
+    lower: [0, 100, 100]
+    upper: [10, 255, 255]
+  yellow:
+    lower: [20, 100, 100]
+    upper: [30, 255, 255]
+  blue:
+    lower: [100, 100, 100]
+    upper: [130, 255, 255]
+
+# Other camera related parameters
+image_topic: "/camera/color/image_raw"
+camera_info_topic: "/camera/color/camera_info"

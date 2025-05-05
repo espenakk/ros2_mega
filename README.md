@@ -11,31 +11,35 @@ Program for å få en UR-robot til å:
 
 ```bash
 ur_cube_pointer/
-├── CMakeLists.txt
+├── setup.py
+├── setup.cfg
 ├── package.xml
+├── resource/
+│   └── ur_cube_pointer
+├── ur_cube_pointer/
+│   ├── __init__.py
+│   ├── camera_node/
+│   │   ├── __init__.py
+│   │   ├── camera_node.py
+│   │   └── cube_detection.py
+│   ├── robot_controller_node/
+│   │   ├── __init__.py
+│   │   ├── robot_controller_node.py
+│   │   └── move_to_position.py
+│   └── task_manager_node/
+│       ├── __init__.py
+│       └── task_manager_node.py
+├── config/
+│   ├── camera_params.yaml
+│   └── robot_params.yaml
 ├── launch/
 │   ├── bringup.launch.py
 │   ├── camera_pipeline.launch.py
 │   └── move_to_home.launch.py
-├── config/
-│   ├── camera_params.yaml
-│   └── robot_params.yaml
-├── src/
-│   ├── camera_node/
-│   │   ├── camera_node.cpp
-│   │   └── cube_detection.cpp
-│   ├── robot_controller_node/
-│   │   ├── robot_controller_node.cpp
-│   │   └── move_to_position.cpp
-│   ├── task_manager_node/
-│   │   └── task_manager_node.cpp
-│   └── utils/
-│       ├── transformations.cpp
-│       └── vision_helpers.cpp
-├── urdf/
-│   └── (hvis aktuelt)
 ├── rviz/
 │   └── cube_detection.rviz
+├── urdf/
+│   └── (hvis aktuelt)
 ├── README.md
 ```
 
@@ -75,9 +79,9 @@ ur_cube_pointer/
 
 | Person | Ansvar | Filer |
 |:---|:---|:---|
-| 1 | Kamera-node og fargedeteksjon | `camera_node.cpp`, `cube_detection.cpp` |
-| 2 | Robot-kontroller | `robot_controller_node.cpp`, `move_to_position.cpp` |
-| 3 | Task manager | `task_manager_node.cpp`, hjelpefiler i `utils/` |
+| 1 | Kamera-node og fargedeteksjon | `camera_node.py`, `cube_detection.py` |
+| 2 | Robot-kontroller | `robot_controller_node.py`, `move_to_position.py` |
+| 3 | Task manager | `task_manager_node.py`, hjelpefiler i `utils/` |
 | 4 | Launch-filer, konfigurasjon, testing, RViz, dokumentasjon | `*.launch.py`, `*.yaml`, `*.rviz`, `README.md` |
 
 ---
@@ -86,7 +90,7 @@ ur_cube_pointer/
 
 Dette prosjektet er delt mellom fire hovedansvarsområder for å sikre effektivt samarbeid og god modulstruktur i ROS2.
 
-### 👤 Person 1 – Kamera og kube-deteksjon (Vision Engineer)
+### 👤 Person 1 – Kamera og kube-deteksjon
 
 **Ansvar:** Utvikle og teste kamera-pipeline for bildeinnhenting og fargedeteksjon av kuber.
 
@@ -106,7 +110,7 @@ Dette prosjektet er delt mellom fire hovedansvarsområder for å sikre effektivt
 
 ---
 
-### 👤 Person 2 – Robotkontroller og MoveIt (Motion Engineer)
+### 👤 Person 2 – Robotkontroller og MoveIt
 
 **Ansvar:** Kontrollere robotens bevegelser via MoveIt og implementere bevegelsesnoder.
 
@@ -125,7 +129,7 @@ Dette prosjektet er delt mellom fire hovedansvarsområder for å sikre effektivt
 
 ---
 
-### 👤 Person 3 – Oppgavelogikk og feilhåndtering (System Integrator)
+### 👤 Person 3 – Oppgavelogikk og feilhåndtering
 
 **Ansvar:** Koordinere flyt og sekvenser, og håndtere avvik i systemet.
 
@@ -143,7 +147,7 @@ Dette prosjektet er delt mellom fire hovedansvarsområder for å sikre effektivt
 
 ---
 
-### 👤 Person 4 – Infrastruktur, testing og dokumentasjon (Tech Lead)
+### 👤 Person 4 – Infrastruktur, testing og dokumentasjon
 
 **Ansvar:** Oppsett, integrasjon, testing og dokumentasjon av systemet.
 
@@ -156,7 +160,7 @@ Dette prosjektet er delt mellom fire hovedansvarsområder for å sikre effektivt
 
 #### Leveranser
 - `launch/`, `rviz/`, `README.md`
-- GitHub/Bitbucket-repo med versjonskontroll
+- GitHub-repo
 - Testbeskrivelser og prosedyrer
 - Struktur- og samarbeidsseksjon i rapporten
 

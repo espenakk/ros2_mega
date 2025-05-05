@@ -1,0 +1,13 @@
+# Robot parameters
+home_position:
+  joint_values: [0.0, -1.57, 1.57, -1.57, -1.57, 0.0] # Example joint values for home
+
+pointing_offset: # Offset from cube center to pointing target
+  x: 0.0
+  y: 0.0
+  z: 0.1 # Point 10cm above the cube
+
+# MoveIt parameters (example)
+planning_group: "ur_manipulator" # Adjust based on your MoveIt config
+velocity_scaling_factor: 0.5
+acceleration_scaling_factor: 0.5
