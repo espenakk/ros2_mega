@@ -14,22 +14,34 @@
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+import os
+
+from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
-    ld = LaunchDescription()
-
-    # TODO: Add parameter loading from camera_params.yaml
-
-    camera_node = Node(
-        package='ur_cube_pointer',
-        executable='camera_node',
-        name='camera_node',
-        output='screen',
-        # parameters=[...] # Load parameters here
+    # Get path to the YAML file
+    config_path = os.path.join(
+        get_package_share_directory('ur_cube_pointer'),
+        'config',
+        'color_params.yaml'
     )
 
-    # TODO: Add image view or RViz node for visualization
+    return LaunchDescription([
+        Node(
+            package='usb_cam',
+            executable='usb_cam_node_exe',
+            name='usb_cam',
+            parameters=[],
+            remappings=[],
+            output='screen',
+            arguments=['--ros-args', '-p', 'video_device:=/dev/video0']  # Specify the video device here
+        ),
 
-    ld.add_action(camera_node)
-
-    return ld
+        Node(
+            package='color_detection',
+            executable='color_detection_node',
+            name='color_detector',
+            parameters=[config_path],
+            output='screen'
+        )
+    ])

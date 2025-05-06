@@ -9,17 +9,30 @@ distortion_coefficients:
   cols: 5
   data: [k1, k2, p1, p2, k3]
 
-# HSV color thresholds for cube detection (example)
-color_thresholds:
-  red:
-    lower: [0, 100, 100]
-    upper: [10, 255, 255]
-  yellow:
-    lower: [20, 100, 100]
-    upper: [30, 255, 255]
-  blue:
-    lower: [100, 100, 100]
-    upper: [130, 255, 255]
+# HSV color thresholds for cube detection
+color_detector:
+  ros__parameters:
+    red.hue_low: 0
+    red.hue_high: 10
+    red.sat_low: 100
+    red.sat_high: 255
+    red.val_low: 100
+    red.val_high: 255
+
+    yellow.hue_low: 20
+    yellow.hue_high: 30
+    yellow.sat_low: 100
+    yellow.sat_high: 255
+    yellow.val_low: 100
+    yellow.val_high: 255
+
+    blue.hue_low: 100
+    blue.hue_high: 130
+    blue.sat_low: 100
+    blue.sat_high: 255
+    blue.val_low: 100
+    blue.val_high: 255
+
 
 # Other camera related parameters
 image_topic: "/camera/color/image_raw"

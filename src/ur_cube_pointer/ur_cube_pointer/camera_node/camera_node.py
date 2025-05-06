@@ -19,3 +19,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# Usikker på om den her er nødvendig, ettersom vi kan starte opp kameraet manuelt gjennom launch
+# (slik som i camera_pipeline.launch.py)
