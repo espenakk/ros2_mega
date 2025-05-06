@@ -1,6 +1,11 @@
 # Robot parameters
-home_position:
-  joint_values: [0.0, -1.57, 1.57, -1.57, -1.57, 0.0] # Example joint values for home
+named_positions:
+  home:
+    position: [0.0, -1.57, 1.57, 0.0, 1.57, 0.0]
+  camera_view_1:
+    position: [0.2, -1.2, 1.0, 0.0, 1.0, 0.0]
+  camera_view_2:
+    position: [-0.2, -1.2, 1.0, 0.0, 1.0, 0.0]
 
 pointing_offset: # Offset from cube center to pointing target
   x: 0.0
