@@ -1,4 +1,0 @@
-<!-- Placeholder for URDF files (e.g., robot model, object models) -->
-<robot name="placeholder">
-  <link name="base_link"/>
-</robot>

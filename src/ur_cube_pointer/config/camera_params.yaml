@@ -1,39 +1,39 @@
-# Camera intrinsic parameters (example)
-camera_matrix:
-  rows: 3
-  cols: 3
-  data: [fx, 0, cx, 0, fy, cy, 0, 0, 1]
-
-distortion_coefficients:
-  rows: 1
-  cols: 5
-  data: [k1, k2, p1, p2, k3]
-
-# HSV color thresholds for cube detection
-color_detector:
+camera_node: # This MUST match the name given in new CameraNode() in C++
   ros__parameters:
-    red.hue_low: 0
-    red.hue_high: 10
-    red.sat_low: 100
-    red.sat_high: 255
-    red.val_low: 100
-    red.val_high: 255
+    image_topic: "/image_raw"
+    min_contour_area: 500.0
 
-    yellow.hue_low: 20
-    yellow.hue_high: 30
-    yellow.sat_low: 100
-    yellow.sat_high: 255
-    yellow.val_low: 100
-    yellow.val_high: 255
-
-    blue.hue_low: 100
-    blue.hue_high: 130
-    blue.sat_low: 100
-    blue.sat_high: 255
-    blue.val_low: 100
-    blue.val_high: 255
-
-
-# Other camera related parameters
-image_topic: "/camera/color/image_raw"
-camera_info_topic: "/camera/color/camera_info"
+    # Red (split range in HSV)
+    h_min_red1: 0
+    s_min_red1: 120
+    v_min_red1: 70
+    h_max_red1: 10
+    s_max_red1: 255
+    v_max_red1: 255
+    h_min_red2: 170
+    s_min_red2: 120
+    v_min_red2: 70
+    h_max_red2: 180
+    s_max_red2: 255
+    v_max_red2: 255
+    # Yellow
+    h_min_yellow: 20
+    s_min_yellow: 100
+    v_min_yellow: 100
+    h_max_yellow: 30
+    s_max_yellow: 255
+    v_max_yellow: 255
+    # Blue
+    h_min_blue: 90
+    s_min_blue: 80
+    v_min_blue: 80
+    h_max_blue: 130
+    s_max_blue: 255
+    v_max_blue: 255
+    # Green - New Parameters (Tune these values!)
+    h_min_green: 35
+    s_min_green: 80
+    v_min_green: 70
+    h_max_green: 85
+    s_max_green: 255
+    v_max_green: 255

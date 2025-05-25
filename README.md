@@ -201,3 +201,13 @@ Dette prosjektet er delt mellom fire hovedansvarsområder for å sikre effektivt
     ```
 
 ---
+
+# Commands
+
+```bash
+ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3 launch_rviz:=true
+```
+
+```bash
+ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur3 robot_ip:=143.25.150.7 use_mock_hardware:=true initial_joint_controller:=scaled_joint_trajectory_controller kinematics_params_file:="${HOME}/my_robot_calibration.yaml" launch_rviz:=false
+```
