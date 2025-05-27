@@ -16,7 +16,7 @@ def generate_launch_description():
     # --- usb_cam Node Configuration (Simplified) ---
     video_device_arg = DeclareLaunchArgument(
         'video_device',
-        default_value='/dev/video4', # You confirmed /dev/video4 works
+        default_value='/dev/video2', # You confirmed /dev/video4 works
         description='USB camera device path (e.g., /dev/video0)'
     )
 
