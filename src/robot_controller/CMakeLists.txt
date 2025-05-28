@@ -19,6 +19,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
+find_package(std_msgs REQUIRED)
 
 add_executable(robot_controller_node src/robot_controller_node.cpp)
 
@@ -30,6 +31,7 @@ ament_target_dependencies(robot_controller_node
   tf2
   tf2_geometry_msgs
   tf2_eigen
+  std_msgs
 )
 
 # target_include_directories(robot_controller_node PUBLIC

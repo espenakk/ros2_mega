@@ -55,7 +55,6 @@ def generate_launch_description():
     return LaunchDescription([
         video_device_arg,
         usb_cam_node,
-
         camera_node_cpp_params_arg,
         cube_detector_node
     ])

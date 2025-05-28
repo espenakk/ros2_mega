@@ -2,11 +2,10 @@
 #include "sensor_msgs/msg/image.hpp"
 #include "cv_bridge/cv_bridge.hpp"
 #include "opencv2/opencv.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "custom_interfaces/msg/detected_cube.hpp"
 #include "custom_interfaces/msg/detected_cubes.hpp"
-#include "std_msgs/msg/header.hpp"
+#include <vector>
 
 class CameraNode : public rclcpp::Node
 {
@@ -47,14 +46,6 @@ public:
         this->declare_parameter<int>("s_max_blue", 255);
         this->declare_parameter<int>("v_max_blue", 255);
 
-        // Green parameters
-        this->declare_parameter<int>("h_min_green", 35);
-        this->declare_parameter<int>("s_min_green", 80);
-        this->declare_parameter<int>("v_min_green", 70);
-        this->declare_parameter<int>("h_max_green", 85);
-        this->declare_parameter<int>("s_max_green", 255);
-        this->declare_parameter<int>("v_max_green", 255);
-
         // Get parameter values
         image_topic_ = this->get_parameter("image_topic").as_string();
         min_contour_area_ = this->get_parameter("min_contour_area").as_double();
@@ -91,30 +82,8 @@ public:
         s_max_blue_ = this->get_parameter("s_max_blue").as_int();
         v_max_blue_ = this->get_parameter("v_max_blue").as_int();
 
-        // Green parameters
-        h_min_green_ = this->get_parameter("h_min_green").as_int();
-        s_min_green_ = this->get_parameter("s_min_green").as_int();
-        v_min_green_ = this->get_parameter("v_min_green").as_int();
-        h_max_green_ = this->get_parameter("h_max_green").as_int();
-        s_max_green_ = this->get_parameter("s_max_green").as_int();
-        v_max_green_ = this->get_parameter("v_max_green").as_int();
-
-        // Homography setup
-        std::vector<cv::Point2f> image_points = {
-            cv::Point2f(788, 555),   // Top Left
-            cv::Point2f(1043, 695),  // Top Right
-            cv::Point2f(1140, 516),  // Bottom Right
-            cv::Point2f(884, 393)    // Bottom Left
-        };
-
-        std::vector<cv::Point2f> world_points = {
-            cv::Point2f(0.0f, 0.0f),    // Top Left
-            cv::Point2f(0.45f, 0.0f),   // Top Right
-            cv::Point2f(0.45f, 0.30f),  // Bottom Right
-            cv::Point2f(0.0f, 0.30f)    // Bottom Left
-        };
-
-        H_ = cv::findHomography(image_points, world_points);
+        // Initialize homography with validation
+        initialize_homography();
 
         // Initialize subscriptions and publishers
         image_subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
@@ -124,7 +93,6 @@ public:
         red_publisher_ = this->create_publisher<custom_interfaces::msg::DetectedCube>("/red_cube_coordinate", 10);
         yellow_publisher_ = this->create_publisher<custom_interfaces::msg::DetectedCube>("/yellow_cube_coordinate", 10);
         blue_publisher_ = this->create_publisher<custom_interfaces::msg::DetectedCube>("/blue_cube_coordinate", 10);
-        green_publisher_ = this->create_publisher<custom_interfaces::msg::DetectedCube>("/green_cube_coordinate", 10);
 
         RCLCPP_INFO(this->get_logger(), "Node initialized with:");
         RCLCPP_INFO(this->get_logger(), " - Image topic: %s", image_topic_.c_str());
@@ -132,15 +100,54 @@ public:
     }
 
 private:
-    geometry_msgs::msg::Point transform_to_robot_coords(const geometry_msgs::msg::Point& pixel_point)
+    void initialize_homography() {
+        // Homography setup
+        std::vector<cv::Point2f> image_points = {
+            cv::Point2f(492, 295),   // Top Left
+            cv::Point2f(403, 435),  // Top Right
+            cv::Point2f(500, 256),  // Bottom Right
+            cv::Point2f(396, 133)    // Bottom Left
+        };
+
+       std::vector<cv::Point2f> world_points = {
+            cv::Point2f(-0.55f, 0.47f),    // Top Left (matches image_points[0])
+            cv::Point2f(-0.22f, 0.76f),    // Top Right (matches image_points[1])
+            cv::Point2f(-0.003f, 0.536f),  // Bottom Right (matches image_points[2])
+            cv::Point2f(-0.3f, 0.247f)     // Bottom Left (matches image_points[3])
+        };
+
+        // Validate point count
+        if (image_points.size() != 4 || world_points.size() != 4) {
+            RCLCPP_ERROR(this->get_logger(),
+                         "Homography requires exactly 4 points. Got %zu and %zu",
+                         image_points.size(), world_points.size());
+            rclcpp::shutdown();
+            return;
+        }
+
+        // Compute homography
+        H_ = cv::findHomography(image_points, world_points);
+        if (H_.empty()) {
+            RCLCPP_FATAL(this->get_logger(), "Homography computation failed!");
+            rclcpp::shutdown();
+        }
+    }
+
+    geometry_msgs::msg::Point transform_to_robot_coords(const cv::Point2f& pixel_point)
     {
-        std::vector<cv::Point2f> src = {cv::Point2f(pixel_point.x, pixel_point.y)};
-        std::vector<cv::Point2f> dst;
-        cv::perspectiveTransform(src, dst, H_);
+        std::vector<cv::Point2f> src_points = {pixel_point};
+        std::vector<cv::Point2f> dst_points;
+
+        try {
+            cv::perspectiveTransform(src_points, dst_points, H_);
+        } catch (const cv::Exception& e) {
+            RCLCPP_ERROR(this->get_logger(), "Perspective transform error: %s", e.what());
+            return geometry_msgs::msg::Point();
+        }
 
         geometry_msgs::msg::Point world_point;
-        world_point.x = dst[0].x;
-        world_point.y = dst[0].y;
+        world_point.x = dst_points[0].x;
+        world_point.y = dst_points[0].y;
         world_point.z = 0.0;
         return world_point;
     }
@@ -155,6 +162,13 @@ private:
                 RCLCPP_WARN(this->get_logger(), "Received empty image frame");
                 return;
             }
+
+            // Optional: Add distortion correction if calibration parameters are available
+            /*
+            cv::Mat undistorted;
+            cv::undistort(frame, undistorted, camera_matrix_, dist_coeffs_);
+            frame = undistorted;
+            */
 
             // Preprocess image
             cv::GaussianBlur(frame, frame, cv::Size(5, 5), 0);
@@ -179,12 +193,6 @@ private:
             detect_color(frame, "blue",
                         cv::Scalar(h_min_blue_, s_min_blue_, v_min_blue_),
                         cv::Scalar(h_max_blue_, s_max_blue_, v_max_blue_),
-                        cv::Scalar(0,0,0), cv::Scalar(0,0,0),
-                        detected_cubes_msg);
-
-            detect_color(frame, "green",
-                        cv::Scalar(h_min_green_, s_min_green_, v_min_green_),
-                        cv::Scalar(h_max_green_, s_max_green_, v_max_green_),
                         cv::Scalar(0,0,0), cv::Scalar(0,0,0),
                         detected_cubes_msg);
 
@@ -213,7 +221,7 @@ private:
         cv::inRange(hsv, hsv_min1, hsv_max1, mask1);
 
         // Handle dual-range colors (like red)
-        bool use_secondary = color_name == "red" &&
+        bool use_secondary = (color_name == "red") &&
                             (hsv_min2[0] > 0 || hsv_min2[1] > 0 || hsv_min2[2] > 0);
 
         if (use_secondary) {
@@ -236,18 +244,19 @@ private:
         for (const auto& contour : contours) {
             double area = cv::contourArea(contour);
             if (area > min_contour_area_) {
-                cv::Rect bounds = cv::boundingRect(contour);
+                // Calculate centroid using moments
+                cv::Moments m = cv::moments(contour);
+                if (m.m00 <= 0.01) continue;  // Avoid division by zero
 
-                // Calculate center point
-                geometry_msgs::msg::Point pixel_center;
-                pixel_center.x = bounds.x + bounds.width/2.0;
-                pixel_center.y = bounds.y + bounds.height/2.0;
-                pixel_center.z = 0;
+                cv::Point2f centroid(
+                    static_cast<float>(m.m10 / m.m00),
+                    static_cast<float>(m.m01 / m.m00)
+                );
 
                 // Create detection message
                 custom_interfaces::msg::DetectedCube cube;
                 cube.color = color_name;
-                cube.position = transform_to_robot_coords(pixel_center);
+                cube.position = transform_to_robot_coords(centroid);
 
                 // Add to aggregated message
                 output_msg.cubes.push_back(cube);
@@ -259,8 +268,6 @@ private:
                     yellow_publisher_->publish(cube);
                 } else if (color_name == "blue") {
                     blue_publisher_->publish(cube);
-                } else if (color_name == "green") {
-                    green_publisher_->publish(cube);
                 }
             }
         }
@@ -272,18 +279,20 @@ private:
     rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr red_publisher_;
     rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr yellow_publisher_;
     rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr blue_publisher_;
-    rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr green_publisher_;
 
     std::string image_topic_;
     double min_contour_area_;
     cv::Mat H_;
+
+    // Placeholders for calibration parameters
+    // cv::Mat camera_matrix_;
+    // cv::Mat dist_coeffs_;
 
     // HSV parameters
     int h_min_red1_, s_min_red1_, v_min_red1_, h_max_red1_, s_max_red1_, v_max_red1_;
     int h_min_red2_, s_min_red2_, v_min_red2_, h_max_red2_, s_max_red2_, v_max_red2_;
     int h_min_yellow_, s_min_yellow_, v_min_yellow_, h_max_yellow_, s_max_yellow_, v_max_yellow_;
     int h_min_blue_, s_min_blue_, v_min_blue_, h_max_blue_, s_max_blue_, v_max_blue_;
-    int h_min_green_, s_min_green_, v_min_green_, h_max_green_, s_max_green_, v_max_green_;
 };
 
 int main(int argc, char* argv[])

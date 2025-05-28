@@ -18,6 +18,7 @@ find_package(cv_bridge REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(custom_interfaces REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(yaml-cpp REQUIRED)  # For YAML configuration loading
 
 # Camera node
@@ -40,6 +41,7 @@ ament_target_dependencies(task_manager
   rclcpp
   geometry_msgs
   custom_interfaces
+  std_msgs
 )
 
 # Link yaml-cpp manually

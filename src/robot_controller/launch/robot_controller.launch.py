@@ -13,7 +13,7 @@ def generate_launch_description():
         name="robot_controller_node",
         output="screen",
         parameters=[
-            {"use_sim_time": LaunchConfiguration("use_sim_time", default="false")}
+            {"use_sim_time": LaunchConfiguration("use_sim_time", default="true")}
             # Set to true if using Gazebo with /clock
         ],
     )
@@ -22,7 +22,7 @@ def generate_launch_description():
         robot_controller_node,
         DeclareLaunchArgument(  # Add use_sim_time argument
             "use_sim_time",
-            default_value="false",
+            default_value="true",
             description="Use simulation (Gazebo) clock if true"
         ),
     ])
