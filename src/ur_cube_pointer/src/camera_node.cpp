@@ -24,12 +24,6 @@ public:
         this->declare_parameter<int>("h_max_red1", 10);
         this->declare_parameter<int>("s_max_red1", 255);
         this->declare_parameter<int>("v_max_red1", 255);
-        this->declare_parameter<int>("h_min_red2", 170);
-        this->declare_parameter<int>("s_min_red2", 120);
-        this->declare_parameter<int>("v_min_red2", 70);
-        this->declare_parameter<int>("h_max_red2", 180);
-        this->declare_parameter<int>("s_max_red2", 255);
-        this->declare_parameter<int>("v_max_red2", 255);
 
         // Yellow parameters
         this->declare_parameter<int>("h_min_yellow", 20);
@@ -47,14 +41,6 @@ public:
         this->declare_parameter<int>("s_max_blue", 255);
         this->declare_parameter<int>("v_max_blue", 255);
 
-        // Green parameters
-        this->declare_parameter<int>("h_min_green", 35);
-        this->declare_parameter<int>("s_min_green", 80);
-        this->declare_parameter<int>("v_min_green", 70);
-        this->declare_parameter<int>("h_max_green", 85);
-        this->declare_parameter<int>("s_max_green", 255);
-        this->declare_parameter<int>("v_max_green", 255);
-
         // Get parameter values
         image_topic_ = this->get_parameter("image_topic").as_string();
         min_contour_area_ = this->get_parameter("min_contour_area").as_double();
@@ -66,14 +52,6 @@ public:
         h_max_red1_ = this->get_parameter("h_max_red1").as_int();
         s_max_red1_ = this->get_parameter("s_max_red1").as_int();
         v_max_red1_ = this->get_parameter("v_max_red1").as_int();
-
-        // Red2 parameters
-        h_min_red2_ = this->get_parameter("h_min_red2").as_int();
-        s_min_red2_ = this->get_parameter("s_min_red2").as_int();
-        v_min_red2_ = this->get_parameter("v_min_red2").as_int();
-        h_max_red2_ = this->get_parameter("h_max_red2").as_int();
-        s_max_red2_ = this->get_parameter("s_max_red2").as_int();
-        v_max_red2_ = this->get_parameter("v_max_red2").as_int();
 
         // Yellow parameters
         h_min_yellow_ = this->get_parameter("h_min_yellow").as_int();
@@ -90,14 +68,6 @@ public:
         h_max_blue_ = this->get_parameter("h_max_blue").as_int();
         s_max_blue_ = this->get_parameter("s_max_blue").as_int();
         v_max_blue_ = this->get_parameter("v_max_blue").as_int();
-
-        // Green parameters
-        h_min_green_ = this->get_parameter("h_min_green").as_int();
-        s_min_green_ = this->get_parameter("s_min_green").as_int();
-        v_min_green_ = this->get_parameter("v_min_green").as_int();
-        h_max_green_ = this->get_parameter("h_max_green").as_int();
-        s_max_green_ = this->get_parameter("s_max_green").as_int();
-        v_max_green_ = this->get_parameter("v_max_green").as_int();
 
         // Homography setup
         std::vector<cv::Point2f> image_points = {
@@ -166,8 +136,6 @@ private:
             detect_color(frame, "red",
                         cv::Scalar(h_min_red1_, s_min_red1_, v_min_red1_),
                         cv::Scalar(h_max_red1_, s_max_red1_, v_max_red1_),
-                        cv::Scalar(h_min_red2_, s_min_red2_, v_min_red2_),
-                        cv::Scalar(h_max_red2_, s_max_red2_, v_max_red2_),
                         detected_cubes_msg);
 
             detect_color(frame, "yellow",
@@ -179,12 +147,6 @@ private:
             detect_color(frame, "blue",
                         cv::Scalar(h_min_blue_, s_min_blue_, v_min_blue_),
                         cv::Scalar(h_max_blue_, s_max_blue_, v_max_blue_),
-                        cv::Scalar(0,0,0), cv::Scalar(0,0,0),
-                        detected_cubes_msg);
-
-            detect_color(frame, "green",
-                        cv::Scalar(h_min_green_, s_min_green_, v_min_green_),
-                        cv::Scalar(h_max_green_, s_max_green_, v_max_green_),
                         cv::Scalar(0,0,0), cv::Scalar(0,0,0),
                         detected_cubes_msg);
 
@@ -259,9 +221,7 @@ private:
                     yellow_publisher_->publish(cube);
                 } else if (color_name == "blue") {
                     blue_publisher_->publish(cube);
-                } else if (color_name == "green") {
-                    green_publisher_->publish(cube);
-                }
+                } 
             }
         }
     }
@@ -272,7 +232,6 @@ private:
     rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr red_publisher_;
     rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr yellow_publisher_;
     rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr blue_publisher_;
-    rclcpp::Publisher<custom_interfaces::msg::DetectedCube>::SharedPtr green_publisher_;
 
     std::string image_topic_;
     double min_contour_area_;
@@ -280,10 +239,8 @@ private:
 
     // HSV parameters
     int h_min_red1_, s_min_red1_, v_min_red1_, h_max_red1_, s_max_red1_, v_max_red1_;
-    int h_min_red2_, s_min_red2_, v_min_red2_, h_max_red2_, s_max_red2_, v_max_red2_;
     int h_min_yellow_, s_min_yellow_, v_min_yellow_, h_max_yellow_, s_max_yellow_, v_max_yellow_;
     int h_min_blue_, s_min_blue_, v_min_blue_, h_max_blue_, s_max_blue_, v_max_blue_;
-    int h_min_green_, s_min_green_, v_min_green_, h_max_green_, s_max_green_, v_max_green_;
 };
 
 int main(int argc, char* argv[])
