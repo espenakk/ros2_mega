@@ -103,17 +103,17 @@ private:
     void initialize_homography() {
         // Homography setup
         std::vector<cv::Point2f> image_points = {
-            cv::Point2f(492, 295),   // Top Left
-            cv::Point2f(403, 435),  // Top Right
-            cv::Point2f(500, 256),  // Bottom Right
-            cv::Point2f(396, 133)    // Bottom Left
+            cv::Point2f(0, 480),   // Top Left
+            cv::Point2f(640, 480),  // Top Right
+            cv::Point2f(640, 0),  // Bottom Right
+            cv::Point2f(0, 0)    // Bottom Left
         };
 
        std::vector<cv::Point2f> world_points = {
-            cv::Point2f(-0.55f, 0.47f),    // Top Left (matches image_points[0])
-            cv::Point2f(-0.22f, 0.76f),    // Top Right (matches image_points[1])
-            cv::Point2f(-0.003f, 0.536f),  // Bottom Right (matches image_points[2])
-            cv::Point2f(-0.3f, 0.247f)     // Bottom Left (matches image_points[3])
+            cv::Point2f(-0.5f, 0.55f),    // Top Left (matches image_points[0])
+            cv::Point2f(-0.06f, 0.65f),    // Top Right (matches image_points[1])
+            cv::Point2f(0.055f, 0.32f),  // Bottom Right (matches image_points[2])
+            cv::Point2f(-0.5f, 0.176f)     // Bottom Left (matches image_points[3])
         };
 
         // Validate point count

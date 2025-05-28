@@ -160,7 +160,7 @@ private:
                     geometry_msgs::msg::PoseStamped pose = home_pose_;
                     pose.pose.position.x = cube.position.x;
                     pose.pose.position.y = cube.position.y;
-                    pose.pose.position.z = 0.20;  // Approach height
+                    pose.pose.position.z = 0.15;  // Approach height
                     target_poses_.push_back(pose);
                 }
                 target_poses_.push_back(home_pose_);  // Final home position
