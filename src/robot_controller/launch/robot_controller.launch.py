@@ -2,7 +2,7 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
-from moveit_configs_utils import MoveItConfigsBuilder  # Recommended way to load robot description
+from moveit_configs_utils import MoveItConfigsBuilder
 
 
 def generate_launch_description():
