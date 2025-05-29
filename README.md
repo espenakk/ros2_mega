@@ -3,7 +3,7 @@
 Programmet styrer en UR-robot til å:
 - Ta bilde av fargede kuber på bordet
 - Detektere røde, gule og blå kuber
-- Peke på kubene i riktig rekkefølge (rød → gul → blå)
+- Peke på kubene i riktig rekkefølge (rød → blå → gul)
 
 ---
 
@@ -53,3 +53,7 @@ src/
 - `DetectedCube.msg`, `DetectedCubes.msg` i `custom_interfaces/msg/` brukes for å sende informasjon om kuber mellom noder.
 
 ---
+
+For mer informasjon, se kildekoden i de respektive mappene.
+
+Se også [PLAN.md](PLAN.md) for arbeidsfordeling og leveranser.
