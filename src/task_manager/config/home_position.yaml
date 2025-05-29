@@ -11,3 +11,8 @@ task_manager:
         y: 0.77
         z: -0.00001
         w: -0.00005
+
+    backup_positions:
+      position1: [-0.22, 0.6, 0.49]   # x, y, z
+      position2: [-0.68, 0.25, 0.49]
+      position3: [-0.42, -0.007, 0.49]

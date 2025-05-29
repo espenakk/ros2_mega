@@ -102,11 +102,18 @@ public:
 private:
     void initialize_homography() {
         // Homography setup
-        std::vector<cv::Point2f> image_points = {
-            cv::Point2f(0, 480),   // Top Left
-            cv::Point2f(640, 480),  // Top Right
-            cv::Point2f(640, 0),  // Bottom Right
-            cv::Point2f(0, 0)    // Bottom Left
+        //std::vector<cv::Point2f> image_points = {
+         //   cv::Point2f(0, 480),   // Top Left
+           // cv::Point2f(640, 480),  // Top Right
+           // cv::Point2f(640, 0),  // Bottom Right
+           // cv::Point2f(0, 0)    // Bottom Left
+
+         std::vector<cv::Point2f> image_points = {
+            cv::Point2f(0, 0),   // Top Left
+            cv::Point2f(640, 0),  // Top Right
+            cv::Point2f(640, 480),  // Bottom Right
+            cv::Point2f(0, 480)    // Bottom Left
+
         };
 
        std::vector<cv::Point2f> world_points = {

@@ -30,10 +30,3 @@ camera_node: # This MUST match the name given in new CameraNode() in C++
     h_max_blue: 130
     s_max_blue: 255
     v_max_blue: 255
-    # Green - New Parameters (Tune these values!)
-    h_min_green: 35
-    s_min_green: 80
-    v_min_green: 70
-    h_max_green: 85
-    s_max_green: 255
-    v_max_green: 255
