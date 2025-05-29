@@ -10,7 +10,7 @@ using namespace std::chrono_literals;
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("robot_controller_node");
 
-// Define overarching RobotController class, responsible for creating and sending movement plans to the robot
+// RobotController class, responsible for creating and sending movement plans to the robot
 class RobotControllerNode : public rclcpp::Node {
 public:
     RobotControllerNode(const rclcpp::NodeOptions& options)

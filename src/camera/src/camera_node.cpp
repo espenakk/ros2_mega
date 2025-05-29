@@ -7,6 +7,7 @@
 #include "custom_interfaces/msg/detected_cubes.hpp"
 #include <vector>
 
+// CameraNode class, responsible for finding cubes and publishing positions in robot coordinates
 class CameraNode : public rclcpp::Node
 {
 public:

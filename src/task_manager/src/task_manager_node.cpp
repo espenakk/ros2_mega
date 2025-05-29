@@ -8,7 +8,7 @@
 
 using namespace std::chrono_literals;
 
-// Define overarching TaskManager class, responsible for executing the program flow
+// TaskManager class, responsible for executing the program flow
 class TaskManager : public rclcpp::Node {
 public:
     TaskManager() : Node("task_manager"), state_(INIT), current_backup_index_(0) {
