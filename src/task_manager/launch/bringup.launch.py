@@ -7,7 +7,7 @@ import os
 
 def generate_launch_description():
     return LaunchDescription([
-        # Include camera.launch.py from task_manager package
+        # Include camera.launch.py from camera package
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 os.path.join(
@@ -29,7 +29,7 @@ def generate_launch_description():
             ])
         ),
 
-        # Task Manager Node (remains in bringup)
+        # Start task_manager_node from task_manager package, with fixed positions loaded as .yaml parameter
         Node(
             package='task_manager',
             executable='task_manager_node',
@@ -37,7 +37,7 @@ def generate_launch_description():
             parameters=[os.path.join(
                 get_package_share_directory('task_manager'),
                 'config',
-                'home_position.yaml'
+                'fixed_positions.yaml'
             )]
         ),
     ])

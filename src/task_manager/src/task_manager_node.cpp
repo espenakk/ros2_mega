@@ -8,10 +8,11 @@
 
 using namespace std::chrono_literals;
 
+// Define overarching TaskManager class, responsible for executing the program flow
 class TaskManager : public rclcpp::Node {
 public:
     TaskManager() : Node("task_manager"), state_(INIT), current_backup_index_(0) {
-        // Declare parameters
+        // Declare parameters for home position
         this->declare_parameter<std::string>("home_position.frame_id", "base_link");
         this->declare_parameter<double>("home_position.position.x", -0.253);
         this->declare_parameter<double>("home_position.position.y", 0.44);
@@ -29,6 +30,7 @@ public:
         load_home_position();
         load_backup_positions();
 
+        // Add a pose publisher
         pose_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/pose_goal", 10);
 
         // Add feedback subscription
@@ -53,6 +55,7 @@ public:
     }
 
 private:
+    // Create all necessary private class variables
     enum State { INIT, MOVING_HOME, SCANNING_AT_HOME,
                  MOVING_TO_BACKUP, SCANNING_AT_BACKUP, MOVING_TO_CUBE, DONE };
     State state_;
@@ -67,8 +70,8 @@ private:
     size_t current_target_ = 0;
     size_t current_backup_index_ = 0;
     int retry_count_ = 0;
-    bool skip_home_movement_ = false;
 
+    // Function to load home position
     void load_home_position() {
         try {
             home_pose_.header.frame_id = this->get_parameter("home_position.frame_id").as_string();
@@ -84,7 +87,7 @@ private:
             rclcpp::shutdown();
         }
     }
-
+    // Function to handle moving to backup positions logic
     void load_backup_positions() {
         try {
             // Load three backup positions
@@ -114,7 +117,7 @@ private:
                 RCLCPP_WARN(this->get_logger(), "Only %zu backup positions loaded. Using default positions",
                            backup_poses_.size());
 
-                // Add default positions if not enough were loaded
+                // Add default positions if not enough were loaded from .yaml
                 while (backup_poses_.size() < 3) {
                     geometry_msgs::msg::PoseStamped pose;
                     pose.header.frame_id = "base_link";
@@ -122,16 +125,16 @@ private:
 
                     switch(backup_poses_.size()) {
                         case 0:
-                            pose.pose.position.x = -0.2;
-                            pose.pose.position.y = 0.5;
+                            pose.pose.position.x = -0.22;
+                            pose.pose.position.y = 0.6;
                             break;
                         case 1:
-                            pose.pose.position.x = -0.3;
-                            pose.pose.position.y = 0.5;
+                            pose.pose.position.x = -0.68;
+                            pose.pose.position.y = 0.25;
                             break;
                         case 2:
-                            pose.pose.position.x = -0.25;
-                            pose.pose.position.y = 0.6;
+                            pose.pose.position.x = -0.42;
+                            pose.pose.position.y = 0.007;
                             break;
                     }
 
@@ -141,24 +144,25 @@ private:
         } catch (const std::exception& e) {
             RCLCPP_ERROR(this->get_logger(), "Backup position error: %s. Using defaults", e.what());
 
-            // Create default backup positions
+            // Create default backup positions, in case .yaml parameters are not loaded
             backup_poses_.resize(3);
             for (auto& pose : backup_poses_) {
                 pose.header.frame_id = "base_link";
                 pose.pose = home_pose_.pose;
             }
 
-            backup_poses_[0].pose.position.x = -0.2;
-            backup_poses_[0].pose.position.y = 0.5;
+            backup_poses_[0].pose.position.x = -0.22;
+            backup_poses_[0].pose.position.y = 0.6;
 
-            backup_poses_[1].pose.position.x = -0.3;
-            backup_poses_[1].pose.position.y = 0.5;
+            backup_poses_[1].pose.position.x = -0.68;
+            backup_poses_[1].pose.position.y = 0.25;
 
-            backup_poses_[2].pose.position.x = -0.25;
-            backup_poses_[2].pose.position.y = 0.6;
+            backup_poses_[2].pose.position.x = -0.42;
+            backup_poses_[2].pose.position.y = 0.007;
         }
     }
 
+    // Function to send a new goal to the robot planner
     void send_goal(const geometry_msgs::msg::PoseStamped& goal) {
         auto stamped_goal = goal;
         stamped_goal.header.stamp = this->now();
@@ -166,6 +170,7 @@ private:
         pose_pub_->publish(stamped_goal);
     }
 
+    // Switch-case logic to decide where the robot should move
     void goal_reached_callback(const std_msgs::msg::Bool::SharedPtr msg) {
         if (!msg->data) {
             RCLCPP_ERROR(this->get_logger(), "Movement failed. Retrying...");
@@ -236,6 +241,8 @@ private:
         }
     }
 
+    // Scanning function, responsible for retrieving the data from the camera node
+    // and formating it in a way that is useful for decision making
     void start_scanning() {
     RCLCPP_INFO(this->get_logger(), "Scanning for cubes...");
 
@@ -244,7 +251,7 @@ private:
         scan_timeout_timer_->cancel();
     }
 
-    // Start timeout timer (e.g., 5 seconds)
+    // Start timeout timer, set to 5 seconds
     scan_timeout_timer_ = this->create_wall_timer(5s, [this]() {
         RCLCPP_WARN(this->get_logger(), "Scan timeout. No cubes detected.");
         scan_timeout_timer_->cancel();  // Stop the timer
@@ -288,6 +295,7 @@ private:
 
             std::vector<custom_interfaces::msg::DetectedCube> sorted_cubes;
             // Sort: red -> blue -> yellow
+            // Done by pushing new cubes to the back of the list
             for (const auto& cube : msg->cubes) {
                 if (cube.color == "red") sorted_cubes.push_back(cube);
             }

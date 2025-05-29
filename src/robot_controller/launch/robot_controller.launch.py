@@ -15,6 +15,7 @@ def generate_launch_description():
         parameters=[
             {"use_sim_time": LaunchConfiguration("use_sim_time", default="true")}
             # Set to true if using Gazebo with /clock
+            # This was set to true due to syncing issues with the other ROS2 nodes
         ],
     )
 

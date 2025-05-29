@@ -140,6 +140,7 @@ private:
         }
     }
 
+    // Transform from pixel points to actual real world points
     geometry_msgs::msg::Point transform_to_robot_coords(const cv::Point2f& pixel_point)
     {
         std::vector<cv::Point2f> src_points = {pixel_point};
@@ -169,13 +170,6 @@ private:
                 RCLCPP_WARN(this->get_logger(), "Received empty image frame");
                 return;
             }
-
-            // Optional: Add distortion correction if calibration parameters are available
-            /*
-            cv::Mat undistorted;
-            cv::undistort(frame, undistorted, camera_matrix_, dist_coeffs_);
-            frame = undistorted;
-            */
 
             // Preprocess image
             cv::GaussianBlur(frame, frame, cv::Size(5, 5), 0);

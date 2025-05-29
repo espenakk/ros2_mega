@@ -1,4 +1,4 @@
-camera_node: # This MUST match the name given in new CameraNode() in C++
+camera_node:
   ros__parameters:
     image_topic: "/image_raw"
     min_contour_area: 500.0

@@ -10,6 +10,7 @@ using namespace std::chrono_literals;
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("robot_controller_node");
 
+// Define overarching RobotController class, responsible for creating and sending movement plans to the robot
 class RobotControllerNode : public rclcpp::Node {
 public:
     RobotControllerNode(const rclcpp::NodeOptions& options)
@@ -48,12 +49,14 @@ public:
     }
 
 private:
+    // Create all necessary private class variables
     moveit::planning_interface::MoveGroupInterface move_group_interface_;
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr pose_subscription_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr feedback_pub_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr ready_pub_;
     rclcpp::TimerBase::SharedPtr ready_timer_;
 
+    // Callback function that is used whenever a new pose_goal is detected
     void pose_goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
         RCLCPP_INFO(LOGGER, "Received new pose goal");
         std_msgs::msg::Bool result_msg;
