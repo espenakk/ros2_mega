@@ -1,3 +1,47 @@
+/**
+ * @class CameraNode
+ * @brief ROS2 node for detecting colored cubes in camera images and publishing their positions.
+ *
+ * This node subscribes to a camera image topic, processes incoming images to detect red, yellow, and blue cubes
+ * using HSV color segmentation, and publishes the detected cube positions in both aggregated and color-specific topics.
+ * The node also transforms detected pixel coordinates to real-world robot coordinates using a homography matrix.
+ *
+ * ## Parameters
+ * - `image_topic` (string): The ROS topic to subscribe for camera images (default: "/image_raw").
+ * - `min_contour_area` (double): Minimum area for a contour to be considered a valid cube (default: 500.0).
+ * - HSV thresholds for red, yellow, and blue colors (integers):
+ *   - Red: `h_min_red1`, `s_min_red1`, `v_min_red1`, `h_max_red1`, `s_max_red1`, `v_max_red1`,
+ *          `h_min_red2`, `s_min_red2`, `v_min_red2`, `h_max_red2`, `s_max_red2`, `v_max_red2`
+ *   - Yellow: `h_min_yellow`, `s_min_yellow`, `v_min_yellow`, `h_max_yellow`, `s_max_yellow`, `v_max_yellow`
+ *   - Blue: `h_min_blue`, `s_min_blue`, `v_min_blue`, `h_max_blue`, `s_max_blue`, `v_max_blue`
+ *
+ * ## Publishers
+ * - `/detected_cubes` (`custom_interfaces::msg::DetectedCubes`): Aggregated list of all detected cubes.
+ * - `/red_cube_coordinate` (`custom_interfaces::msg::DetectedCube`): Position of detected red cubes.
+ * - `/yellow_cube_coordinate` (`custom_interfaces::msg::DetectedCube`): Position of detected yellow cubes.
+ * - `/blue_cube_coordinate` (`custom_interfaces::msg::DetectedCube`): Position of detected blue cubes.
+ *
+ * ## Subscriptions
+ * - Camera image topic (default: `/image_raw`) (`sensor_msgs::msg::Image`): Source of camera frames.
+ *
+ * ## Methods
+ * - `initialize_homography()`: Sets up the homography matrix for pixel-to-world coordinate transformation.
+ * - `transform_to_robot_coords(const cv::Point2f&)`: Converts pixel coordinates to robot/world coordinates.
+ * - `image_callback(const sensor_msgs::msg::Image::SharedPtr)`: Main image processing callback.
+ * - `detect_color(const cv::Mat&, const std::string&, cv::Scalar, cv::Scalar, cv::Scalar, cv::Scalar, custom_interfaces::msg::DetectedCubes&)`:
+ *    Detects cubes of a specific color and publishes their positions.
+ *
+ * ## Dependencies
+ * - OpenCV (for image processing and homography)
+ * - cv_bridge (for ROS <-> OpenCV image conversion)
+ * - ROS2 (rclcpp, sensor_msgs, geometry_msgs)
+ * - Custom message types: `custom_interfaces::msg::DetectedCube`, `custom_interfaces::msg::DetectedCubes`
+ *
+ * ## Usage
+ * Configure HSV thresholds and other parameters via ROS2 parameters or launch files as needed.
+ * The node will output detected cube positions in both aggregated and per-color topics.
+ */
+
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 #include "cv_bridge/cv_bridge.hpp"
@@ -102,13 +146,6 @@ public:
 
 private:
     void initialize_homography() {
-        // Homography setup
-        //std::vector<cv::Point2f> image_points = {
-         //   cv::Point2f(0, 480),   // Top Left
-           // cv::Point2f(640, 480),  // Top Right
-           // cv::Point2f(640, 0),  // Bottom Right
-           // cv::Point2f(0, 0)    // Bottom Left
-
          std::vector<cv::Point2f> image_points = {
             cv::Point2f(0, 0),   // Top Left
             cv::Point2f(640, 0),  // Top Right
@@ -285,10 +322,6 @@ private:
     std::string image_topic_;
     double min_contour_area_;
     cv::Mat H_;
-
-    // Placeholders for calibration parameters
-    // cv::Mat camera_matrix_;
-    // cv::Mat dist_coeffs_;
 
     // HSV parameters
     int h_min_red1_, s_min_red1_, v_min_red1_, h_max_red1_, s_max_red1_, v_max_red1_;

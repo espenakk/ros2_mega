@@ -16,36 +16,30 @@ def generate_launch_description():
     # Define argument for which video device we want to use
     video_device_arg = DeclareLaunchArgument(
         'video_device',
-        default_value='/dev/video2', # You confirmed /dev/video4 works
+        default_value='/dev/video2',
         description='USB camera device path (e.g., /dev/video0)'
     )
 
-    # Start the usb_camera, with the parameter passed for which device we are using
     usb_cam_node = Node(
         package='usb_cam',
         executable='usb_cam_node_exe',
         name='usb_cam',
         parameters=[{
             'video_device': LaunchConfiguration('video_device'),
-            'pixel_format': 'yuyv2rgb', # Important for BGR8 conversion for OpenCV
-            # Using default width/height/framerate from usb_cam,
-            # which seemed to be 640x480 @ 30fps and worked.
-            # Add them explicitly if you need specific values:
+            'pixel_format': 'yuyv2rgb',
             # 'image_width': 640,
             # 'image_height': 480,
             # 'framerate': 30.0,
         }]
-        # No remappings: will publish to /image_raw and /camera_info
+        # Publish to /image_raw and /camera_info
     )
 
-    # Define parameter as LaunchArgument for necessary camera parameters in .yaml
     camera_node_cpp_params_arg = DeclareLaunchArgument(
         'camera_params_file',
         default_value=camera_node_params_file,
         description='Full path to the camera_node parameters file'
     )
 
-    # The camera node, responsible for cube detection
     camera_node = Node(
         package='camera',
         executable='camera_node',

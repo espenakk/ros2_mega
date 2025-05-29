@@ -1,3 +1,46 @@
+/**
+ * @class TaskManager
+ * @brief A ROS2 node for managing robot tasks involving moving to home, backup, and cube positions.
+ *
+ * The TaskManager node coordinates the robot's movement between a home position, several backup positions,
+ * and dynamically detected cube positions. It handles state transitions, goal sending, feedback processing,
+ * and scanning for cubes using a camera node. The node is parameterized for home and backup positions,
+ * and robustly handles movement retries and scan timeouts.
+ *
+ * Main Features:
+ * - Loads home and backup positions from ROS2 parameters, with defaults if not provided.
+ * - Publishes pose goals to a planner/controller.
+ * - Subscribes to feedback topics to track goal completion and controller readiness.
+ * - Scans for cubes using a camera node, with a timeout mechanism.
+ * - Sorts detected cubes by color priority (red, blue, yellow) and generates target poses.
+ * - Handles retries on movement failure and aborts after repeated failures.
+ * - Manages state transitions for moving, scanning, and task completion.
+ *
+ * States:
+ *   - INIT: Waiting for controller to be ready.
+ *   - MOVING_HOME: Moving to the home position.
+ *   - SCANNING_AT_HOME: Scanning for cubes at the home position.
+ *   - MOVING_TO_BACKUP: Moving to backup positions if no cubes found at home.
+ *   - SCANNING_AT_BACKUP: Scanning for cubes at backup positions.
+ *   - MOVING_TO_CUBE: Moving to detected cube positions.
+ *   - DONE: Task completed, returning home.
+ *
+ * Parameters:
+ *   - home_position.frame_id (string): Frame for home position (default: "base_link").
+ *   - home_position.position.x/y/z (double): Home position coordinates.
+ *   - home_position.orientation.x/y/z/w (double): Home orientation quaternion.
+ *   - backup_positions.position1/2/3 (vector<double>): Backup positions (x, y, z).
+ *
+ * Topics:
+ *   - Publishes: /pose_goal (geometry_msgs::msg::PoseStamped)
+ *   - Subscribes: /goal_reached (std_msgs::msg::Bool), /controller_ready (std_msgs::msg::Bool), /detected_cubes (custom_interfaces::msg::DetectedCubes)
+ *
+ * Usage:
+ *   Instantiate as a ROS2 node. Ensure required parameters are set or defaults will be used.
+ *   The node will wait for the controller to be ready, move to home, scan for cubes, and proceed
+ *   through backup positions and detected cubes as needed.
+ */
+
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "custom_interfaces/msg/detected_cubes.hpp"

@@ -1,3 +1,25 @@
+/**
+ * @class RobotControllerNode
+ * @brief A ROS 2 node for controlling a robot manipulator using MoveIt.
+ *
+ * This node subscribes to pose goals and commands the robot to move to the specified poses.
+ * It uses MoveIt's MoveGroupInterface for planning and executing motions.
+ * The node publishes feedback on whether the goal was reached and signals when the controller is ready.
+ *
+ * Publishers:
+ *   - /goal_reached (std_msgs::msg::Bool): Publishes true if the robot successfully reaches the goal pose.
+ *   - /controller_ready (std_msgs::msg::Bool): Publishes true when the controller is initialized and ready.
+ *
+ * Subscriptions:
+ *   - /pose_goal (geometry_msgs::msg::PoseStamped): Receives target poses for the robot to move to.
+ *
+ * Timers:
+ *   - ready_timer_: Periodically checks if the MoveIt interface is ready and publishes the ready status.
+ *
+ * Usage:
+ *   Instantiate this node within a ROS 2 launch file or executable to enable pose-based robot control.
+ */
+
 #include <memory>
 #include <chrono>
 #include <rclcpp/rclcpp.hpp>
