@@ -8,7 +8,7 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
     # Path to the parameters file for your C++ camera_node
     camera_node_params_file = os.path.join(
-        get_package_share_directory('ur_cube_pointer'), # Ensure this is your package name
+        get_package_share_directory('camera'), # Ensure this is your package name
         'config',
         'camera_params.yaml'
     )
@@ -45,7 +45,7 @@ def generate_launch_description():
     )
 
     cube_detector_node = Node(
-        package='ur_cube_pointer', # Ensure this is your package name
+        package='camera', # Ensure this is your package name
         executable='camera_node',    # The executable from your C++ code
         name='camera_node',      # The name of your C++ node (as defined in its constructor)
         output='screen',

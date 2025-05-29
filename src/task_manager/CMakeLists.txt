@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(ur_cube_pointer)
+project(task_manager)
 
 # Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
@@ -13,31 +13,13 @@ endif()
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(cv_bridge REQUIRED)
-find_package(OpenCV REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(custom_interfaces REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(yaml-cpp REQUIRED)  # For YAML configuration loading
-
-# Camera node
-add_executable(camera_node src/camera_node.cpp)
-target_include_directories(camera_node PRIVATE
-  ${OpenCV_INCLUDE_DIRS}
-)
-ament_target_dependencies(camera_node
-  rclcpp
-  sensor_msgs
-  cv_bridge
-  geometry_msgs
-  custom_interfaces
-  OpenCV
-)
 
 # Task manager
-add_executable(task_manager src/task_manager.cpp)
-ament_target_dependencies(task_manager
+add_executable(task_manager_node src/task_manager_node.cpp)
+ament_target_dependencies(task_manager_node
   rclcpp
   geometry_msgs
   custom_interfaces
@@ -45,12 +27,11 @@ ament_target_dependencies(task_manager
 )
 
 # Link yaml-cpp manually
-target_link_libraries(task_manager yaml-cpp)
+# target_link_libraries(task_manager yaml-cpp)
 
 # Install targets
 install(TARGETS
-  camera_node
-  task_manager
+  task_manager_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

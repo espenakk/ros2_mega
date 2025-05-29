@@ -10,13 +10,13 @@ Program for å få en UR-robot til å:
 ## 📂 Prosjektstruktur
 
 ```bash
-ur_cube_pointer/
+task_manager/
 ├── setup.py
 ├── setup.cfg
 ├── package.xml
 ├── resource/
-│   └── ur_cube_pointer
-├── ur_cube_pointer/
+│   └── task_manager
+├── task_manager/
 │   ├── __init__.py
 │   ├── camera_node/
 │   │   ├── __init__.py
@@ -197,7 +197,7 @@ Dette prosjektet er delt mellom fire hovedansvarsområder for å sikre effektivt
     ```
 3. Kjør prosjektet:
     ```bash
-    ros2 launch ur_cube_pointer bringup.launch.py
+    ros2 launch task_manager bringup.launch.py
     ```
 
 ---

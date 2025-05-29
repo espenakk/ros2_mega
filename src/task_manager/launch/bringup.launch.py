@@ -7,11 +7,11 @@ import os
 
 def generate_launch_description():
     return LaunchDescription([
-        # Include camera.launch.py from ur_cube_pointer package
+        # Include camera.launch.py from task_manager package
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 os.path.join(
-                    get_package_share_directory('ur_cube_pointer'),
+                    get_package_share_directory('camera'),
                     'launch',
                     'camera.launch.py'
                 )
@@ -31,11 +31,11 @@ def generate_launch_description():
 
         # Task Manager Node (remains in bringup)
         Node(
-            package='ur_cube_pointer',
-            executable='task_manager',
+            package='task_manager',
+            executable='task_manager_node',
             name='task_manager',
             parameters=[os.path.join(
-                get_package_share_directory('ur_cube_pointer'),
+                get_package_share_directory('task_manager'),
                 'config',
                 'home_position.yaml'
             )]
